@@ -3,6 +3,14 @@
   "productName": "Ovo Frito — 100% Local-First API Client",
   "version": "1.0.0",
   "description": "Ovo Frito — Cliente HTTP portátil 100% Local-First com exportação nativa .ovo",
+  "author": {
+    "name": "GetDevBR",
+    "email": "vinicius@get.dev.br"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/getdevbr/ovo-frito.git"
+  },
   "main": "main.js",
   "bin": {
     "ovo-frito": "./cli.js"
