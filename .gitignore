@@ -6,6 +6,7 @@ dist/
 *.exe
 *.blockmap
 *.yml
+!.github/workflows/*.yml
 
 # Runtime/user data (local-first app state)
 data/
