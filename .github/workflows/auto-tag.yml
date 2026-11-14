@@ -1,0 +1,95 @@
+name: Auto Tag
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    name: Create tag from package.json version
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bump patch version if needed
+        id: bump
+        env:
+          # Mesmo motivo do push da tag: GITHUB_TOKEN não dispara workflows
+          # em cascata e pode falhar se main tiver branch protection.
+          PUSH_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          CURRENT=$(node -p "require('./package.json').version")
+          LATEST=$(git tag -l 'v*' --sort=-v:refname | head -n 1)
+          LATEST_VERSION="${LATEST#v}"
+          if [ -z "$LATEST_VERSION" ] || [ "$LATEST_VERSION" != "$CURRENT" ]; then
+            echo "Sem bump: package.json=$CURRENT, latest tag=${LATEST:-nenhuma}"
+            exit 0
+          fi
+          NEW=$(node -e "const [a,b,c]=process.argv[1].split('.').map(Number);console.log(\`\${a}.\${b}.\${c+1}\`)" "$CURRENT")
+          node -e "
+            const fs=require('fs');
+            for (const f of ['package.json','package-lock.json']) {
+              const j=JSON.parse(fs.readFileSync(f,'utf8'));
+              j.version='$NEW';
+              if (j.packages && j.packages['']) j.packages[''].version='$NEW';
+              fs.writeFileSync(f, JSON.stringify(j,null,2)+'\n');
+            }
+          "
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to $NEW [skip ci]"
+          git push "https://x-access-token:${PUSH_TOKEN}@github.com/${{ github.repository }}.git" HEAD:main
+          echo "Bump: $CURRENT -> $NEW"
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check if tag already exists
+        id: check
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create and push tag
+        if: steps.check.outputs.exists == 'false'
+        env:
+          # RELEASE_PAT (PAT com Contents: write) é necessário para que o push
+          # da tag dispare o workflow de release. Sem ele, usa GITHUB_TOKEN
+          # (a tag é criada, mas o build não é acionado automaticamente).
+          PUSH_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push "https://x-access-token:${PUSH_TOKEN}@github.com/${{ github.repository }}.git" "$TAG"
+
+      - name: Tag summary
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          EXISTS: ${{ steps.check.outputs.exists }}
+        run: |
+          if [ "$EXISTS" = "true" ]; then
+            echo "Tag $TAG já existe — nada a fazer."
+          else
+            echo "Tag $TAG criada. Release workflow será disparado."
+          fi
