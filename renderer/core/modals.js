@@ -209,7 +209,22 @@ function renderNetworkStatusIndicators() {
 }
 
 
-function openNetworkModal() {
+function switchNetworkConfigTab(tabName) {
+  const modal = document.getElementById('networkModal');
+  if (!modal) return;
+  const target = tabName || 'appearance';
+  modal.querySelectorAll('[data-cfg-tab]').forEach((b) => {
+    const active = b.dataset.cfgTab === target;
+    b.classList.toggle('active', active);
+    b.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  modal.querySelectorAll('.cfg-pane').forEach((p) => {
+    p.classList.toggle('active', p.id === `cfgPane-${target}`);
+  });
+}
+
+
+function openNetworkModal(tabName) {
   const net = ensureNetworkSettings();
   const chkCert = document.getElementById('netIgnoreCertErrorsCheckbox');
   const timeoutIn = document.getElementById('netTimeoutMsInput');
@@ -241,6 +256,7 @@ function openNetworkModal() {
     fieldsBox.style.opacity = chkProxy?.checked ? '1' : '0.55';
   }
 
+  switchNetworkConfigTab(tabName);
   document.getElementById('networkModal')?.classList.remove('hidden');
 }
 
@@ -731,6 +747,7 @@ function initCompareProfileModal() {
     renderCookieJarModal,
     ensureNetworkSettings,
     renderNetworkStatusIndicators,
+    switchNetworkConfigTab,
     openNetworkModal,
     syncCollectionConfigAuthFields,
     openCollectionConfigModal,

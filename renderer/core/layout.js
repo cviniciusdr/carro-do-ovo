@@ -1602,8 +1602,12 @@ async function init() {
   });
 
   // Network Modal (Proxy, Certificado SSL/TLS, mTLS & Exportar Workspace .ovo)
-  document.getElementById('btnOpenNetworkModal')?.addEventListener('click', openNetworkModal);
-  document.getElementById('statusNetworkSummary')?.addEventListener('click', openNetworkModal);
+  document.getElementById('btnOpenNetworkModal')?.addEventListener('click', () => openNetworkModal());
+  document.getElementById('statusNetworkSummary')?.addEventListener('click', () => openNetworkModal('network'));
+
+  document.querySelectorAll('#networkModal [data-cfg-tab]').forEach((btn) => {
+    btn.addEventListener('click', () => switchNetworkConfigTab(btn.dataset.cfgTab));
+  });
 
   document.getElementById('btnCloseNetworkModal')?.addEventListener('click', () => {
     document.getElementById('networkModal')?.classList.add('hidden');

@@ -917,130 +917,156 @@
     </div>
   </div>
 
-  <!-- Modal Consolidado de Configurações (Aparência, Disposição, Proxy, Certificado SSL/TLS e Cookies) -->
+  <!-- Modal Consolidado de Configurações (Aparência, Rede, Segurança SSL/mTLS e Dados) -->
   <div id="networkModal" class="modal-backdrop hidden">
     <div class="modal modal-large">
       <div class="modal-header">
-        <h3>⚙ Configurações — Aparência, Disposição, Proxy &amp; SSL/TLS</h3>
+        <h3>⚙ Configurações</h3>
         <button id="btnCloseNetworkModal" class="btn-icon">✕</button>
       </div>
+      <div class="subtabs" role="tablist" aria-label="Seções de configuração">
+        <button type="button" class="subtab active" data-cfg-tab="appearance" role="tab" aria-selected="true">🎨 Aparência</button>
+        <button type="button" class="subtab" data-cfg-tab="network" role="tab" aria-selected="false">🌐 Rede</button>
+        <button type="button" class="subtab" data-cfg-tab="security" role="tab" aria-selected="false">🔒 Segurança</button>
+        <button type="button" class="subtab" data-cfg-tab="data" role="tab" aria-selected="false">💾 Dados</button>
+      </div>
       <div class="modal-body">
-        <!-- Seção 1: Aparência, Tema & Disposição das Janelas -->
-        <div class="env-profile-config-card">
-          <div class="pane-header" style="margin-bottom:8px;">
-            <span><strong>🪟 Aparência, Tema, Disposição &amp; Backup `.ovo`</strong></span>
-            <div class="chain-actions">
-              <button id="btnToggleTheme" type="button" class="btn-small" title="Alternar Tema Dark / Light">☀ Alternar Tema (Dark / Light)</button>
-              <button id="btnOpenCookiesModal" type="button" class="btn-small" title="Gerenciar Cookie Jar Local (./data/cookies.json)">🍪 Gerenciar Cookies <span id="badgeCookieJar"></span></button>
-              <button id="btnExportWorkspaceOvo" type="button" class="btn-small" title="Exportar Workspace Completo (Collections, Environments, Profiles e Configurações) em um único arquivo .ovo">🥚 Exportar Workspace (.ovo)</button>
+        <!-- Aba: Aparência, Tema & Disposição das Janelas -->
+        <div class="cfg-pane active" id="cfgPane-appearance" role="tabpanel">
+          <div class="env-profile-config-card">
+            <div class="pane-header" style="margin-bottom:8px;">
+              <span><strong>🪟 Tema &amp; Disposição das Janelas</strong></span>
+              <div class="chain-actions">
+                <button id="btnToggleTheme" type="button" class="btn-small" title="Alternar Tema Dark / Light">☀ Alternar Tema (Dark / Light)</button>
+              </div>
             </div>
-          </div>
 
-          <div class="disposition-section-title">Posição do Menu Lateral (Sidebar)</div>
-          <div class="disposition-grid" style="margin-bottom:8px;">
-            <button type="button" class="btn-small" data-disp-sidebar="left">◧ Menu à Esquerda</button>
-            <button type="button" class="btn-small" data-disp-sidebar="right">◨ Menu à Direita</button>
-            <button type="button" class="btn-small" data-disp-sidebar="toggle">⬜ Recolher / Expandir</button>
-          </div>
+            <div class="disposition-section-title">Posição do Menu Lateral (Sidebar)</div>
+            <div class="disposition-grid" style="margin-bottom:8px;">
+              <button type="button" class="btn-small" data-disp-sidebar="left">◧ Menu à Esquerda</button>
+              <button type="button" class="btn-small" data-disp-sidebar="right">◨ Menu à Direita</button>
+              <button type="button" class="btn-small" data-disp-sidebar="toggle">⬜ Recolher / Expandir</button>
+            </div>
 
-          <div class="disposition-section-title">Disposição: Request &amp; Response</div>
-          <div class="disposition-grid" style="margin-bottom:8px;">
-            <button type="button" class="btn-small" data-disp-split="vertical">⬍ Req Cima / Resp Baixo</button>
-            <button type="button" class="btn-small" data-disp-split="vertical-reverse">⬆ Resp Cima / Req Baixo</button>
-            <button type="button" class="btn-small" data-disp-split="horizontal">⬌ Req Esq / Resp Dir</button>
-            <button type="button" class="btn-small" data-disp-split="horizontal-reverse">⬅ Resp Esq / Req Dir</button>
-          </div>
+            <div class="disposition-section-title">Disposição: Request &amp; Response</div>
+            <div class="disposition-grid" style="margin-bottom:8px;">
+              <button type="button" class="btn-small" data-disp-split="vertical">⬍ Req Cima / Resp Baixo</button>
+              <button type="button" class="btn-small" data-disp-split="vertical-reverse">⬆ Resp Cima / Req Baixo</button>
+              <button type="button" class="btn-small" data-disp-split="horizontal">⬌ Req Esq / Resp Dir</button>
+              <button type="button" class="btn-small" data-disp-split="horizontal-reverse">⬅ Resp Esq / Req Dir</button>
+            </div>
 
-          <div class="disposition-section-title">Foco / Proporção das Janelas</div>
-          <div class="disposition-grid">
-            <button type="button" class="btn-small" data-disp-focus="equal">⚖ Dividir 50% / 50%</button>
-            <button type="button" class="btn-small" data-disp-focus="request">⛶ Focar só Request</button>
-            <button type="button" class="btn-small" data-disp-focus="response">⛶ Focar só Response</button>
+            <div class="disposition-section-title">Foco / Proporção das Janelas</div>
+            <div class="disposition-grid">
+              <button type="button" class="btn-small" data-disp-focus="equal">⚖ Dividir 50% / 50%</button>
+              <button type="button" class="btn-small" data-disp-focus="request">⛶ Focar só Request</button>
+              <button type="button" class="btn-small" data-disp-focus="response">⛶ Focar só Response</button>
+            </div>
           </div>
         </div>
 
-        <!-- Seção 2: Certificado SSL / TLS & Certificado Cliente (mTLS) -->
-        <div class="env-profile-config-card" style="margin-top:6px;">
-          <div class="pane-header" style="margin-bottom:8px;">
-            <span><strong>🔒 Certificado SSL / TLS &amp; Certificado Digital Cliente (mTLS)</strong></span>
-          </div>
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:var(--text-primary); margin-bottom:8px;">
-            <input id="netIgnoreCertErrorsCheckbox" type="checkbox" style="accent-color:var(--accent); width:15px; height:15px;" />
-            <span><strong>Ignorar erros de certificado SSL/TLS</strong> (Aceitar certificados autoassinados / expirados / CA interna — <code>rejectUnauthorized: false</code>)</span>
-          </label>
-          <div style="display:flex; align-items:center; gap:10px; margin-top:8px; margin-bottom:10px;">
-            <label for="netTimeoutMsInput" style="margin:0; min-width:170px;">Timeout da Requisição (ms):</label>
-            <input id="netTimeoutMsInput" type="number" min="1000" step="1000" class="text-input" style="max-width:160px;" value="30000" />
-          </div>
-
-          <div style="border-top:1px solid var(--border-color); padding-top:10px; margin-top:6px;">
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:var(--text-primary); margin-bottom:8px;">
-              <input id="netMtlsEnabledCheckbox" type="checkbox" style="accent-color:var(--accent); width:15px; height:15px;" />
-              <span><strong>Habilitar Certificado Digital do Cliente (mTLS — `.pfx` / `.p12` ou `.crt` + `.key`)</strong></span>
+        <!-- Aba: Rede — Timeout & Proxy HTTP / HTTPS -->
+        <div class="cfg-pane" id="cfgPane-network" role="tabpanel">
+          <div class="env-profile-config-card">
+            <div class="pane-header" style="margin-bottom:8px;">
+              <span><strong>🌐 Rede &amp; Servidor Proxy (HTTP / HTTPS Tunnel)</strong></span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <label for="netTimeoutMsInput" style="margin:0; min-width:170px;">Timeout da Requisição (ms):</label>
+              <input id="netTimeoutMsInput" type="number" min="1000" step="1000" class="text-input" style="max-width:160px;" value="30000" />
+            </div>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:var(--text-primary); margin-bottom:10px;">
+              <input id="netProxyEnabledCheckbox" type="checkbox" style="accent-color:var(--accent); width:15px; height:15px;" />
+              <span><strong>Habilitar Proxy customizado para envio das requisições</strong></span>
             </label>
-            <div id="netMtlsFieldsContainer" class="chain-grid" style="grid-template-columns: 1fr 1fr; gap:10px;">
-              <div>
-                <label>Arquivo `.pfx` / `.p12` (PKCS#12) ou Certificado `.crt`/`.pem`:</label>
-                <div style="display:flex; gap:6px; align-items:center;">
-                  <label class="btn-small" style="cursor:pointer; flex-shrink:0;">
-                    📂 Carregar `.pfx`/`.p12`/`.crt`
-                    <input id="netMtlsCertFileInput" type="file" accept=".pfx,.p12,.crt,.pem,.cer" class="hidden" />
-                  </label>
-                  <span id="netMtlsCertFileName" class="badge" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Nenhum certificado carregado</span>
-                  <button id="btnClearMtlsCert" type="button" class="btn-icon" title="Remover certificado carregado">✕</button>
+
+            <div id="netProxyFieldsContainer" style="display:flex; flex-direction:column; gap:10px;">
+              <div class="chain-grid" style="grid-template-columns: 120px 1fr 120px;">
+                <div>
+                  <label for="netProxyProtocolSelect">Protocolo:</label>
+                  <select id="netProxyProtocolSelect" class="select-input w-full">
+                    <option value="http">http://</option>
+                    <option value="https">https://</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="netProxyHostInput">Host / Endereço do Proxy (suporta <code>{{var}}</code>):</label>
+                  <input id="netProxyHostInput" type="text" class="text-input" placeholder="Ex: 127.0.0.1 ou proxy.empresa.local" />
+                </div>
+                <div>
+                  <label for="netProxyPortInput">Porta:</label>
+                  <input id="netProxyPortInput" type="text" class="text-input" placeholder="8080" value="8080" />
                 </div>
               </div>
+
+              <div class="chain-grid">
+                <div>
+                  <label for="netProxyUsernameInput">Usuário do Proxy (opcional):</label>
+                  <input id="netProxyUsernameInput" type="text" class="text-input" placeholder="Usuário Basic Auth do Proxy (suporta {{var}})" />
+                </div>
+                <div>
+                  <label for="netProxyPasswordInput">Senha do Proxy (opcional):</label>
+                  <input id="netProxyPasswordInput" type="password" class="text-input" placeholder="Senha do Proxy (suporta {{var}})" />
+                </div>
+              </div>
+
               <div>
-                <label for="netMtlsPassphraseInput">Senha / Passphrase do Certificado (`.pfx` / `.p12` / `.key`):</label>
-                <input id="netMtlsPassphraseInput" type="password" class="text-input" placeholder="Senha do certificado digital (suporta {{var}})" />
+                <label for="netProxyBypassInput">Ignorar Proxy para estes hosts (Bypass / No-Proxy, separados por vírgula):</label>
+                <input id="netProxyBypassInput" type="text" class="text-input" placeholder="localhost, 127.0.0.1, ::1, *.local" />
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Seção 3: Proxy HTTP / HTTPS -->
-        <div class="env-profile-config-card" style="margin-top:6px;">
-          <div class="pane-header" style="margin-bottom:8px;">
-            <span><strong>🌐 Servidor Proxy (HTTP / HTTPS Tunnel)</strong></span>
+        <!-- Aba: Segurança — Certificado SSL / TLS & mTLS -->
+        <div class="cfg-pane" id="cfgPane-security" role="tabpanel">
+          <div class="env-profile-config-card">
+            <div class="pane-header" style="margin-bottom:8px;">
+              <span><strong>🔒 Certificado SSL / TLS &amp; Certificado Digital Cliente (mTLS)</strong></span>
+            </div>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:var(--text-primary); margin-bottom:8px;">
+              <input id="netIgnoreCertErrorsCheckbox" type="checkbox" style="accent-color:var(--accent); width:15px; height:15px;" />
+              <span><strong>Ignorar erros de certificado SSL/TLS</strong> (Aceitar certificados autoassinados / expirados / CA interna — <code>rejectUnauthorized: false</code>)</span>
+            </label>
+
+            <div style="border-top:1px solid var(--border-color); padding-top:10px; margin-top:6px;">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:var(--text-primary); margin-bottom:8px;">
+                <input id="netMtlsEnabledCheckbox" type="checkbox" style="accent-color:var(--accent); width:15px; height:15px;" />
+                <span><strong>Habilitar Certificado Digital do Cliente (mTLS — `.pfx` / `.p12` ou `.crt` + `.key`)</strong></span>
+              </label>
+              <div id="netMtlsFieldsContainer" class="chain-grid" style="grid-template-columns: 1fr 1fr; gap:10px;">
+                <div>
+                  <label>Arquivo `.pfx` / `.p12` (PKCS#12) ou Certificado `.crt`/`.pem`:</label>
+                  <div style="display:flex; gap:6px; align-items:center;">
+                    <label class="btn-small" style="cursor:pointer; flex-shrink:0;">
+                      📂 Carregar `.pfx`/`.p12`/`.crt`
+                      <input id="netMtlsCertFileInput" type="file" accept=".pfx,.p12,.crt,.pem,.cer" class="hidden" />
+                    </label>
+                    <span id="netMtlsCertFileName" class="badge" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Nenhum certificado carregado</span>
+                    <button id="btnClearMtlsCert" type="button" class="btn-icon" title="Remover certificado carregado">✕</button>
+                  </div>
+                </div>
+                <div>
+                  <label for="netMtlsPassphraseInput">Senha / Passphrase do Certificado (`.pfx` / `.p12` / `.key`):</label>
+                  <input id="netMtlsPassphraseInput" type="password" class="text-input" placeholder="Senha do certificado digital (suporta {{var}})" />
+                </div>
+              </div>
+            </div>
           </div>
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:var(--text-primary); margin-bottom:10px;">
-            <input id="netProxyEnabledCheckbox" type="checkbox" style="accent-color:var(--accent); width:15px; height:15px;" />
-            <span><strong>Habilitar Proxy customizado para envio das requisições</strong></span>
-          </label>
+        </div>
 
-          <div id="netProxyFieldsContainer" style="display:flex; flex-direction:column; gap:10px;">
-            <div class="chain-grid" style="grid-template-columns: 120px 1fr 120px;">
-              <div>
-                <label for="netProxyProtocolSelect">Protocolo:</label>
-                <select id="netProxyProtocolSelect" class="select-input w-full">
-                  <option value="http">http://</option>
-                  <option value="https">https://</option>
-                </select>
-              </div>
-              <div>
-                <label for="netProxyHostInput">Host / Endereço do Proxy (suporta <code>{{var}}</code>):</label>
-                <input id="netProxyHostInput" type="text" class="text-input" placeholder="Ex: 127.0.0.1 ou proxy.empresa.local" />
-              </div>
-              <div>
-                <label for="netProxyPortInput">Porta:</label>
-                <input id="netProxyPortInput" type="text" class="text-input" placeholder="8080" value="8080" />
-              </div>
+        <!-- Aba: Dados — Cookies, Armazenamento Local & Backup .ovo -->
+        <div class="cfg-pane" id="cfgPane-data" role="tabpanel">
+          <div class="env-profile-config-card">
+            <div class="pane-header" style="margin-bottom:8px;">
+              <span><strong>💾 Dados Locais &amp; Backup</strong></span>
             </div>
-
-            <div class="chain-grid">
-              <div>
-                <label for="netProxyUsernameInput">Usuário do Proxy (opcional):</label>
-                <input id="netProxyUsernameInput" type="text" class="text-input" placeholder="Usuário Basic Auth do Proxy (suporta {{var}})" />
-              </div>
-              <div>
-                <label for="netProxyPasswordInput">Senha do Proxy (opcional):</label>
-                <input id="netProxyPasswordInput" type="password" class="text-input" placeholder="Senha do Proxy (suporta {{var}})" />
-              </div>
-            </div>
-
-            <div>
-              <label for="netProxyBypassInput">Ignorar Proxy para estes hosts (Bypass / No-Proxy, separados por vírgula):</label>
-              <input id="netProxyBypassInput" type="text" class="text-input" placeholder="localhost, 127.0.0.1, ::1, *.local" />
+            <p style="font-size:12px; color:var(--text-secondary); margin:0 0 10px;">
+              Cookies, histórico, collections e configurações ficam salvos localmente em <code>./data/</code> neste dispositivo.
+            </p>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button id="btnOpenCookiesModal" type="button" class="btn-small" title="Gerenciar Cookie Jar Local (./data/cookies.json)">🍪 Gerenciar Cookies <span id="badgeCookieJar"></span></button>
+              <button id="btnExportWorkspaceOvo" type="button" class="btn-small" title="Exportar Workspace Completo (Collections, Environments, Profiles e Configurações) em um único arquivo .ovo">🥚 Exportar Workspace (.ovo)</button>
             </div>
           </div>
         </div>
