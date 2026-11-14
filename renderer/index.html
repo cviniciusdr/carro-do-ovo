@@ -188,6 +188,7 @@
           <button class="subtab" data-req-tab="headers">Headers <span id="badgeHeaders" class="badge"></span></button>
           <button class="subtab" data-req-tab="body">Body <span id="badgeBody" class="badge-dot"></span></button>
           <button class="subtab" data-req-tab="tests">Tests &amp; Captura <span id="badgeTests" class="badge"></span></button>
+          <button class="subtab" data-req-tab="database">🗄️ Database (SQL) <span id="badgeDb" class="badge"></span></button>
           <button class="subtab" data-req-tab="scripts">Scripts (pm.*) <span id="badgeScripts" class="badge-dot"></span></button>
           <div class="subtabs-right-actions">
             <button id="btnSwapFromReq" class="btn-panel-ctrl" title="Inverter posição Request ⇄ Response">⇄</button>
@@ -447,7 +448,7 @@
           <div class="tests-split">
             <div class="tests-col">
               <div class="pane-header">
-                <span>✅ Assertions</span>
+                <span>✅ Assertions (HTTP + <code>dbResult.*</code>)</span>
                 <button id="btnAddAssertion" class="btn-small">+ Assertion</button>
               </div>
               <div id="assertionsTable" class="kv-table"></div>
@@ -463,12 +464,33 @@
           </div>
         </div>
 
+        <!-- Database (SQL) Tab — Pre-request Data Seeding/Fetching & Post-request Assertions -->
+        <div id="req-tab-database" class="req-tab-pane">
+          <div class="tests-split" style="flex:1; min-height:0;">
+            <div class="tests-col" style="min-height:0; overflow-y:auto;">
+              <div class="pane-header">
+                <span>🌱 Pre-request SQL (Data Seeding / Data Fetching → <code>{{var}}</code>)</span>
+                <button id="btnAddPreDbQuery" class="btn-small" type="button">+ Query Pré-request</button>
+              </div>
+              <div id="preDbQueriesList" class="kv-table"></div>
+            </div>
+            <div class="inner-resizer-vertical" title="Arraste para redimensionar Pre-DB / Post-DB"></div>
+            <div class="tests-col" style="min-height:0; overflow-y:auto;">
+              <div class="pane-header">
+                <span>🔍 Post-request SQL (Database Assertions → <code>dbResult.rows[0].*</code> / <code>dbResult.rowCount</code>)</span>
+                <button id="btnAddPostDbQuery" class="btn-small" type="button">+ Query Pós-request</button>
+              </div>
+              <div id="postDbQueriesList" class="kv-table"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- Scripts (pm.*) Tab (Compatível com Postman Pre-request & Post-response Scripts) -->
         <div id="req-tab-scripts" class="req-tab-pane">
           <div class="tests-split" style="flex:1; min-height:0;">
             <div class="tests-col" style="min-height:0;">
               <div class="pane-header">
-                <span>⚡ Pre-request Script (<code>pm.environment.set</code>, <code>pm.request.headers.add</code>)</span>
+                <span>⚡ Pre-request Script (<code>pm.environment.set</code>, <code>await pm.db.query</code>)</span>
               </div>
               <textarea
                 id="preRequestScriptInput"
@@ -480,8 +502,11 @@
             <div class="inner-resizer-vertical" title="Arraste para redimensionar Pre-request / Post-response"></div>
             <div class="tests-col" style="min-height:0;">
               <div class="pane-header">
-                <span>🧪 Post-response / Tests Script (<code>pm.test</code>, <code>pm.expect</code>, <code>pm.response.json()</code>)</span>
-                <button id="btnInsertSamplePmScript" class="btn-small">+ Exemplo pm.test</button>
+                <span>🧪 Post-response / Tests Script (<code>pm.test</code>, <code>await pm.db.query</code>, <code>dbResult.*</code>)</span>
+                <div style="display:flex; gap:4px;">
+                  <button id="btnInsertSamplePmScript" class="btn-small">+ Exemplo pm.test</button>
+                  <button id="btnInsertSampleDbScript" class="btn-small">+ Exemplo SQL</button>
+                </div>
               </div>
               <textarea
                 id="postResponseScriptInput"
@@ -662,6 +687,64 @@
             <input id="envConfirmDestructiveCheckbox" type="checkbox" style="accent-color:var(--accent); width:14px; height:14px;" />
             <span>🛡️ <strong>Trava Anti-Acidente:</strong> Exigir confirmação antes de disparar <code>DELETE</code>, <code>PUT</code>, <code>PATCH</code> ou <code>POST</code> quando este Profile / Environment estiver ativo</span>
           </label>
+        </div>
+
+        <!-- Conexão de Banco de Dados do Environment (PostgreSQL, MySQL/MariaDB, SQLite) -->
+        <div class="chain-box" style="margin-top: 6px; max-width: 100%;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; color:var(--text-primary); margin:0;">
+              <input id="envDbEnabledCheckbox" type="checkbox" style="accent-color:var(--accent); width:14px; height:14px;" />
+              <span>🗄️ <strong>Conexão de Banco de Dados neste Environment</strong> (PostgreSQL, MySQL/MariaDB ou SQLite — usada em Pre/Post SQL e <code>pm.db.query</code>)</span>
+            </label>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span id="envDbTestStatusBadge" class="badge"></span>
+              <button id="btnTestEnvDbConnection" type="button" class="btn-small">🔌 Testar Conexão</button>
+            </div>
+          </div>
+
+          <div id="envDbFieldsContainer" style="margin-top:8px; display:flex; flex-direction:column; gap:8px;">
+            <div class="chain-grid" style="grid-template-columns: 160px 1fr;">
+              <div>
+                <label for="envDbClientSelect">Driver / Banco:</label>
+                <select id="envDbClientSelect" class="select-input w-full">
+                  <option value="postgres">PostgreSQL (pg)</option>
+                  <option value="mysql">MySQL / MariaDB (mysql2)</option>
+                  <option value="sqlite">SQLite (node:sqlite)</option>
+                </select>
+              </div>
+              <div>
+                <label for="envDbConnectionStringInput">Connection URI / Caminho SQLite (opcional — sobrescreve host/porta):</label>
+                <input id="envDbConnectionStringInput" type="text" class="text-input" placeholder="Ex: postgres://user:pass@127.0.0.1:5432/app_db ou :memory: ou ./data/test.sqlite" />
+              </div>
+            </div>
+
+            <div id="envDbNetworkFieldsGrid" class="chain-grid" style="grid-template-columns: 1.3fr 90px 1fr 1fr 1fr auto; align-items:end; gap:8px;">
+              <div>
+                <label for="envDbHostInput">Host:</label>
+                <input id="envDbHostInput" type="text" class="text-input" placeholder="127.0.0.1" value="127.0.0.1" />
+              </div>
+              <div>
+                <label for="envDbPortInput">Porta:</label>
+                <input id="envDbPortInput" type="number" class="text-input" placeholder="5432" value="5432" />
+              </div>
+              <div>
+                <label for="envDbDatabaseInput">Database / Arquivo:</label>
+                <input id="envDbDatabaseInput" type="text" class="text-input" placeholder="postgres ou :memory:" />
+              </div>
+              <div>
+                <label for="envDbUserInput">Usuário:</label>
+                <input id="envDbUserInput" type="text" class="text-input" placeholder="postgres" />
+              </div>
+              <div>
+                <label for="envDbPasswordInput">Senha:</label>
+                <input id="envDbPasswordInput" type="password" class="text-input" placeholder="Senha (suporta {{var}})" />
+              </div>
+              <label style="display:flex; align-items:center; gap:4px; cursor:pointer; font-size:11px; height:32px;">
+                <input id="envDbSslCheckbox" type="checkbox" />
+                <span>SSL</span>
+              </label>
+            </div>
+          </div>
         </div>
 
         <div class="pane-header" style="margin-top:6px;">
