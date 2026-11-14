@@ -72,9 +72,8 @@ jobs:
       - name: Create and push tag
         if: steps.check.outputs.exists == 'false'
         env:
-          # RELEASE_PAT (PAT com Contents: write) é necessário para que o push
-          # da tag dispare o workflow de release. Sem ele, usa GITHUB_TOKEN
-          # (a tag é criada, mas o build não é acionado automaticamente).
+          # PAT só é necessário se a main tiver branch protection que bloqueie
+          # o push do commit de bump. Para a tag em si, GITHUB_TOKEN basta.
           PUSH_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.version.outputs.tag }}
         run: |
@@ -82,6 +81,15 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag "$TAG"
           git push "https://x-access-token:${PUSH_TOKEN}@github.com/${{ github.repository }}.git" "$TAG"
+
+      - name: Dispatch release workflow
+        if: steps.check.outputs.exists == 'false'
+        env:
+          # workflow_dispatch é exceção à regra do GITHUB_TOKEN: este step
+          # dispara release.yml sem precisar de PAT para cascata de eventos.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: gh workflow run release.yml -f tag="$TAG"
 
       - name: Tag summary
         env:
