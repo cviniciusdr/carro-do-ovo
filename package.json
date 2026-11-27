@@ -1,22 +1,39 @@
 {
-  "name": "carro-do-ovo",
-  "productName": "Carro do Ovo — 100% Local-First API Client",
-  "version": "1.0.0",
-  "description": "Carro do Ovo — Cliente HTTP portátil 100% Local-First com exportação nativa .ovo",
+  "name": "ovo-frito",
+  "productName": "Ovo Frito — 100% Local-First API Client",
+  "version": "1.1.0",
+  "description": "Ovo Frito — Cliente HTTP portátil 100% Local-First com exportação nativa .ovo",
+  "author": {
+    "name": "GetDevBR",
+    "email": "vinicius@get.dev.br"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/getdevbr/ovo-frito.git"
+  },
   "main": "main.js",
+  "bin": {
+    "ovo-frito": "./cli.js"
+  },
   "scripts": {
     "start": "electron .",
     "web": "node server-fallback.js",
-	"dist":"electron-builder"
+    "dist": "electron-builder",
+    "test": "node --test \"test/unit/*.test.js\" \"test/integration/*.test.js\" \"tests/*.test.js\"",
+    "test:unit": "node --test \"test/unit/*.test.js\" \"tests/*.test.js\"",
+    "test:integration": "node --test \"test/integration/*.test.js\"",
+    "test:coverage": "node --test --experimental-test-coverage \"test/unit/*.test.js\" \"test/integration/*.test.js\" \"tests/*.test.js\"",
+    "test:e2e": "playwright test test/e2e"
   },
   "devDependencies": {
     "@electron-forge/cli": "^8.0.1",
+    "@playwright/test": "^1.65.1",
     "electron": "^35.0.0",
     "electron-builder": "^26.18.0"
   },
   "build": {
     "appId": "cviniciusdr",
-    "productName": "Carro do Ovo",
+    "productName": "Ovo Frito",
     "win": {
       "target": [
         "nsis",
@@ -33,5 +50,9 @@
     "mac": {
       "target": "dmg"
     }
+  },
+  "dependencies": {
+    "mysql2": "^3.24.6",
+    "pg": "^8.23.1"
   }
 }
