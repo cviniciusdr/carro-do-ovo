@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   tag:
@@ -94,12 +95,11 @@ jobs:
       - name: Dispatch release workflow
         if: steps.check.outputs.exists == 'false'
         env:
-          # workflow_dispatch é exceção à regra do GITHUB_TOKEN: este step
-          # dispara release.yml sem precisar de PAT para cascata de eventos.
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # workflow_dispatch exige actions: write no GITHUB_TOKEN (ou RELEASE_PAT)
+          GH_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.version.outputs.tag }}
         run: |
-          curl -sf -X POST \
+          curl -sfS -X POST \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/actions/workflows/release.yml/dispatches" \
